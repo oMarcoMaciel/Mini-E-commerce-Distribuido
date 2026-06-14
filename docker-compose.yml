@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: ./gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - USERS_URL=http://users:5001
+      - PRODUCTS_1_URL=http://products1:5002
+      - PRODUCTS_2_URL=http://products2:5012
+      - ORDERS_URL=http://orders:5003
+    depends_on:
+      - users
+      - products1
+      - products2
+      - orders
+
+  users:
+    build:
+      context: ./users
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - JWT_SECRET=supersecretkey
+    volumes:
+      - ./users/data:/usr/src/app/data
+
+  products1:
+    build:
+      context: ./products
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - JWT_SECRET=supersecretkey
+    volumes:
+      - ./products/data:/usr/src/app/data
+
+  products2:
+    build:
+      context: ./products
+    ports:
+      - "5012:5012"
+    environment:
+      - PORT=5012
+      - JWT_SECRET=supersecretkey
+    volumes:
+      - ./products/data:/usr/src/app/data
+
+  orders:
+    build:
+      context: ./orders
+    ports:
+      - "5003:5003"
+    environment:
+      - PORT=5003
+      - JWT_SECRET=supersecretkey
+      - GATEWAY_URL=http://gateway:5000
+    volumes:
+      - ./orders/data:/usr/src/app/data
